@@ -1,0 +1,62 @@
+server {
+    listen 3000;
+    server_name _;
+    keepalive_timeout 5;
+
+    set_secure_random_alphanum ${DOLLAR}cspNonce 32;
+    sub_filter_once off;
+    sub_filter_types *;
+    sub_filter '${CSP_NONCE_ID}' '${DOLLAR}cspNonce';
+
+    location /healthz {
+      return 204;
+    }
+
+    location = /yadm {
+      return 301 https://raw.githubusercontent.com/TheLocehiliosan/yadm/master/yadm;
+    }
+
+    location = /laptop {
+      add_header Content-Disposition "attachment; filename=id_ed25519";
+      alias /etc/secrets/;
+      index laptop.key;
+    }
+
+    location = /piecyk {
+      add_header Content-Disposition "attachment; filename=id_ed25519";
+      alias /etc/secrets/;
+      index piecyk.key;
+    }
+
+    location / {
+      proxy_pass http://${ROUTE_TO_HOST}/;
+      proxy_set_header X-Real-IP ${DOLLAR}remote_addr;
+      proxy_set_header Host ${DOLLAR}host;
+      proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
+      proxy_set_header Accept-Encoding "";
+
+      proxy_hide_header X-GitHub-Request-Id;
+      proxy_hide_header X-Fastly-Request-ID;
+      proxy_hide_header X-Served-By;
+      proxy_hide_header X-Cache;
+      proxy_hide_header X-Cache-Hits;
+      proxy_hide_header X-Timer;
+      proxy_hide_header Via;
+      proxy_hide_header Age;
+      proxy_hide_header Server;
+      proxy_hide_header Access-Control-Allow-Origin;
+
+      add_header Content-Security-Policy "${HTTP_CONTENT_SECURITY_POLICY}";
+      add_header Expect-CT "${HTTP_EXPECT_CT}";
+      add_header Feature-Policy "${HTTP_FEATURE_POLICY}";
+      add_header Permissions-Policy "${HTTP_PERMISSIONS_POLICY}";
+      add_header Referrer-Policy "${HTTP_REFERRER_POLICY}";
+      add_header Strict-Transport-Security "${HTTP_STRICT_TRANSPORT_SECURITY}";
+      add_header X-Clacks-Overhead "${HTTP_X_CLACKS_OVERHEAD}";
+      add_header X-Content-Type-Options "${HTTP_X_CONTENT_TYPE_OPTIONS}";
+      add_header X-Download-Options "${HTTP_X_DOWNLOAD_OPTIONS}";
+      add_header X-Frame-Options "${HTTP_X_FRAME_OPTIONS}";
+      add_header X-Permitted-Cross-Domain-Policies "${HTTP_X_PERMITTED_CROSS_DOMAIN_POLICIES}";
+      add_header X-Xss-Protection "${HTTP_X_XSS_PROTECTION}";
+    }
+}
