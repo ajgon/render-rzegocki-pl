@@ -16,16 +16,9 @@ server {
       return 301 https://raw.githubusercontent.com/TheLocehiliosan/yadm/master/yadm;
     }
 
-    location = /laptop {
+    location ~ \.key$ {
       add_header Content-Disposition "attachment; filename=id_ed25519";
-      alias /etc/secrets/;
-      index laptop.key;
-    }
-
-    location = /piecyk {
-      add_header Content-Disposition "attachment; filename=id_ed25519";
-      alias /etc/secrets/;
-      index piecyk.key;
+      root /data/;
     }
 
     location / {

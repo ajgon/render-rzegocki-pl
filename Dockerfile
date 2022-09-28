@@ -76,5 +76,7 @@ RUN set -ex \
        done \
     && rm -rf /tmp/packages
 
+COPY entrypoint.sh /
+ENTRYPOINT ["/entrypoint.sh"]
 EXPOSE 3000
 CMD ["nginx", "-g", "daemon off; load_module modules/ndk_http_module.so; load_module modules/ngx_http_headers_more_filter_module.so; load_module modules/ngx_http_perl_module.so; load_module modules/ngx_http_set_misc_module.so;"]
